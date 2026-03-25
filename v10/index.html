@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>هلا دوريانا - إدارة الدوريات</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --main-bg: #f8f9fa;
+            --sidebar-color: #2c3e50;
+            --accent-color: #3498db;
+            --danger-color: #e74c3c;
+            --success-color: #27ae60;
+            --warning-color: #f1c40f;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #EEE;
+            font-family: 'Cairo', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+            direction: rtl;
+        }
+
+        .sidebar {
+            height: 100vh;
+            background: linear-gradient(180deg, var(--sidebar-color) 0%, #1a2632 100%);
+            color: white;
+            padding-top: 20px;
+            position: fixed;
+            right: 0;
+            width: 280px;
+            z-index: 1000;
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+            transition: var(--transition);
+        }
+
+        .sidebar h3 {
+            font-weight: 700;
+            font-size: 1.5rem;
+            padding: 0 20px 20px;
+            border-bottom: 2px solid var(--accent-color);
+            margin-bottom: 20px;
+        }
+
+        .nav-link {
+            color: #ecf0f1;
+            padding: 12px 25px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            border-right: 3px solid transparent;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: white;
+            background-color: rgba(52, 152, 219, 0.2);
+            border-right-color: var(--accent-color);
+        }
+
+        .main-content {
+            margin-right: 280px;
+            padding: 30px;
+            min-height: 100vh;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--accent-color) 0%, #2980b9 100%);
+            color: white;
+            font-weight: 700;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .btn-pdf {
+            background-color: #f39c12;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+        }
+
+        .card-yellow {
+            color: var(--warning-color);
+        }
+
+        .card-red {
+            color: var(--danger-color);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+            }
+
+            .sidebar h3 span,
+            .nav-link span {
+                display: none;
+            }
+
+            .main-content {
+                margin-right: 70px;
+                padding: 15px;
+            }
+        }
+
+        .input-error {
+            border: 1px solid #e74c3c !important;
+        }
+
+        .error-text {
+            color: #e74c3c;
+            font-size: 0.8rem;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <h3 class="text-center"><i class="fas fa-trophy"></i> <span>هلا دوريانا</span></h3>
+        <nav class="nav flex-column mt-4">
+            <a class="nav-link active" onclick="showSection('teams', this)"><i class="fas fa-users"></i> <span>إدارة
+                    الفرق</span></a>
+            <a class="nav-link" onclick="showSection('players', this)"><i class="fas fa-running"></i> <span>إدارة
+                    اللاعبين</span></a>
+            <a class="nav-link" onclick="showSection('matches', this)"><i class="fas fa-calendar-check"></i> <span>إدارة
+                    المباريات</span></a>
+            <a class="nav-link" onclick="showSection('suspended', this)"><i class="fas fa-user-slash"></i>
+                <span>الموقوفين</span></a>
+            <a class="nav-link" onclick="showSection('reports', this)"><i class="fas fa-chart-line"></i> <span>جدول
+                    الترتيب</span></a>
+            <a class="nav-link" onclick="showSection('scorers', this)"><i class="fas fa-medal"></i> <span>قائمة
+                    الهدافين</span></a>
+        </nav>
+        <div class="px-3 mt-5">
+            <button class="btn btn-outline-danger w-100 btn-sm" onclick="clearAllData()">
+                <i class="fas fa-trash-alt"></i> <span>مسح البيانات</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="main-content">
+
+        <section id="teams" class="section active">
+            <div class="card">
+                <div class="card-header"><span><i class="fas fa-plus-circle"></i> تسجيل فريق جديد</span></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-8"><input type="text" id="teamName" class="form-control"
+                                placeholder="أدخل اسم الفريق"></div>
+                        <div class="col-md-4"><button class="btn btn-primary w-100" onclick="addTeam()">حفظ
+                                الفريق</button></div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header"><span><i class="fas fa-list"></i> قائمة الفرق المسجلة</span></div>
+                <div class="table-responsive">
+                    <table class="table align-middle text-center mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>الفريق</th>
+                                <th>لعب</th>
+                                <th>فاز</th>
+                                <th>نقاط</th>
+                                <th>حذف</th>
+                            </tr>
+                        </thead>
+                        <tbody id="teamsList"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="players" class="section">
+            <div class="card">
+                <div class="card-header"><span><i class="fas fa-user-plus"></i> إضافة لاعب جديد</span></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4"><input type="text" id="playerName" class="form-control"
+                                placeholder="اسم اللاعب"></div>
+                        <div class="col-md-2"><input type="number" id="playerNum" class="form-control"
+                                placeholder="الرقم"></div>
+                        <div class="col-md-4"><select id="playerTeam" class="form-select"></select></div>
+                        <div class="col-md-2"><button class="btn btn-primary w-100" onclick="addPlayer()">إضافة</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header"><span><i class="fas fa-users"></i> قائمة اللاعبين</span></div>
+                <div class="table-responsive">
+                    <table class="table text-center align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>اللاعب</th>
+                                <th>الفريق</th>
+                                <th>أهداف</th>
+                                <th><i class="fas fa-square card-yellow"></i></th>
+                                <th><i class="fas fa-square card-red"></i></th>
+                                <th>حذف</th>
+                            </tr>
+                        </thead>
+                        <tbody id="playersList"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="suspended" class="section">
+            <div class="card" id="pdf-suspended">
+                <div class="card-header bg-danger">
+                    <span><i class="fas fa-exclamation-triangle"></i> قائمة اللاعبين الموقوفين</span>
+                    <button class="btn-pdf" onclick="downloadPDF('pdf-suspended', 'قائمة_الموقوفين')">طباعة</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover text-center align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>اللاعب</th>
+                                <th>الفريق</th>
+                                <th>السبب</th>
+                                <th>الحالة</th>
+                            </tr>
+                        </thead>
+                        <tbody id="suspendedList"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="matches" class="section">
+            <div class="card">
+                <div class="card-header"><span><i class="fas fa-gamepad"></i> تسجيل نتيجة مباراة</span></div>
+                <div class="card-body">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-md-2"><input type="number" id="matchNumber" class="form-control"
+                                placeholder="رقم المباراة"></div>
+                        <div class="col-md-4"><select id="matchTeam1" class="form-select"></select></div>
+                        <div class="col-md-1"><input type="number" id="score1" class="form-control text-center"
+                                value="0"></div>
+                        <div class="col-md-1 text-center fw-bold">VS</div>
+                        <div class="col-md-1"><input type="number" id="score2" class="form-control text-center"
+                                value="0"></div>
+                        <div class="col-md-3"><select id="matchTeam2" class="form-select"></select></div>
+                        <div class="col-md-2"><input type="date" id="matchDate" class="form-control"></div>
+                        <button class="btn btn-primary w-100 mt-3" onclick="addMatch()">اعتماد النتيجة</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card" id="pdf-matches">
+                <div class="card-header">
+                    <span><i class="fas fa-history"></i> سجل المباريات</span>
+                    <button class="btn-pdf" onclick="downloadPDF('pdf-matches', 'سجل_المباريات')"><i
+                            class="fas fa-file-pdf"></i> طباعة الجدول</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered text-center align-middle mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>م</th>
+                                <th>الفريق الأول</th>
+                                <th>النتيجة</th>
+                                <th>الفريق الثاني</th>
+                                <th>التاريخ</th>
+                                <th class="no-print">إجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody id="matchesHistory"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="reports" class="section">
+            <div class="card" id="pdf-standings">
+                <div class="card-header bg-dark text-white">
+                    <span><i class="fas fa-trophy"></i> ترتيب الدوري العام</span>
+                    <button class="btn-pdf" onclick="downloadPDF('pdf-standings', 'جدول_الترتيب')">طباعة</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-striped text-center mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>المركز</th>
+                                <th>الفريق</th>
+                                <th>لعب</th>
+                                <th>فاز</th>
+                                <th>تعادل</th>
+                                <th>خسر</th>
+                                <th>فارق</th>
+                                <th>النقاط</th>
+                            </tr>
+                        </thead>
+                        <tbody id="standingsTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="scorers" class="section">
+            <div class="card" id="pdf-scorers">
+                <div class="card-header">
+                    <span><i class="fas fa-fire text-danger"></i> قائمة هدافي الدوري</span>
+                    <button class="btn-pdf" onclick="downloadPDF('pdf-scorers', 'قائمة_الهدافين')">طباعة</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover text-center align-middle mb-0">
+                        <thead class="table-warning">
+                            <tr>
+                                <th>الترتيب</th>
+                                <th>اللاعب</th>
+                                <th>الفريق</th>
+                                <th>أهداف</th>
+                            </tr>
+                        </thead>
+                        <tbody id="scorersList"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+
+        const Validator = {
+            rules: {
+                required: val => val !== null && val !== undefined && val.toString().trim() !== '',
+                positive: val => !isNaN(val) && Number(val) >= 0,
+                integer: val => Number.isInteger(Number(val)),
+                min: (val, min) => Number(val) >= min,
+                max: (val, max) => Number(val) <= max,
+            },
+
+            validate(value, rules) {
+                for (let rule of rules) {
+                    if (typeof rule === 'string') {
+                        if (!this.rules[rule](value)) return false;
+                    } else {
+                        const [name, param] = rule;
+                        if (!this.rules[name](value, param)) return false;
+                    }
+                }
+                return true;
+            }
+        };
+
+
+        function showError(input, message) {
+            input.classList.add('input-error');
+
+            let error = input.parentElement.querySelector('.error-text');
+            if (!error) {
+                error = document.createElement('div');
+                error.className = 'error-text';
+                input.parentElement.appendChild(error);
+            }
+            error.innerText = message;
+        }
+
+        function clearError(input) {
+            input.classList.remove('input-error');
+            const error = input.parentElement.querySelector('.error-text');
+            if (error) error.remove();
+        }
+
+
+
+        let data = JSON.parse(localStorage.getItem('halaDoryana_v5')) || {
+            teams: [],
+            players: [],
+            matches: []
+        };
+
+        const YELLOW_LIMIT = 3;
+
+        function saveData() {
+            data.players = data.players.map(p => ({
+                ...p,
+                goals: Math.max(0, p.goals),
+                yellow: Math.max(0, p.yellow),
+                red: Math.max(0, p.red)
+            }));
+
+            localStorage.setItem('halaDoryana_v5', JSON.stringify(data));
+            renderAll();
+        }
+
+        function downloadPDF(elementId, fileName) {
+            const element = document.getElementById(elementId);
+            const win = window.open('', '', 'width=900,height=700');
+            win.document.write(`<html><head><title>${fileName}</title><style>body{font-family:Cairo, sans-serif; direction:rtl; padding:20px;} table{width:100%; border-collapse:collapse; margin-top:20px;} th,td{border:1px solid #333; padding:10px; text-align:center;} th{background:#f4f4f4;} .btn-pdf, .no-print, .btn-danger, .btn-sm, .badge, .btn-primary{display:none !important;}</style></head><body onload="window.print()"><h2 style="text-align:center">${fileName}</h2>${element.innerHTML}</body></html>`);
+            win.document.close();
+        }
+
+        function showSection(id, element) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            if (element) element.classList.add('active');
+            renderAll();
+        }
+
+
+        function addTeam() {
+            const input = document.getElementById('teamName');
+            const name = input.value.trim();
+
+            clearError(input);
+
+            if (!Validator.validate(name, ['required'])) {
+                return showError(input, "اسم الفريق مطلوب");
+            }
+
+            if (data.teams.some(t => t.name === name)) {
+                return showError(input, "الفريق موجود مسبقاً");
+            }
+
+            data.teams.push({
+                id: Date.now(),
+                name,
+                played: 0,
+                won: 0,
+                drawn: 0,
+                lost: 0,
+                gf: 0,
+                ga: 0,
+                points: 0
+            });
+
+            input.value = '';
+            saveData();
+        }
+
+        function addPlayer() {
+            const nameInput = document.getElementById('playerName');
+            const numInput = document.getElementById('playerNum');
+            const teamInput = document.getElementById('playerTeam');
+
+            const name = nameInput.value.trim();
+            const num = Number(numInput.value);
+            const team = teamInput.value;
+
+            [nameInput, numInput, teamInput].forEach(clearError);
+
+            let valid = true;
+
+            if (!Validator.validate(name, ['required'])) {
+                showError(nameInput, "اسم اللاعب مطلوب");
+                valid = false;
+            }
+
+            if (!Validator.validate(num, ['required', 'integer', ['min', 1]])) {
+                showError(numInput, "رقم صحيح أكبر من 0");
+                valid = false;
+            }
+
+            if (!Validator.validate(team, ['required'])) {
+                showError(teamInput, "اختر الفريق");
+                valid = false;
+            }
+
+            if (data.players.some(p => p.name === name && p.team === team)) {
+                showError(nameInput, "اللاعب موجود");
+                valid = false;
+            }
+
+            if (!valid) return;
+
+            data.players.push({
+                id: Date.now(),
+                name,
+                number: num,
+                team,
+                goals: 0,
+                yellow: 0,
+                red: 0
+            });
+
+            nameInput.value = '';
+            numInput.value = '';
+            saveData();
+        }
+
+        function addMatch() {
+            const t1Input = document.getElementById('matchTeam1');
+            const t2Input = document.getElementById('matchTeam2');
+            const s1Input = document.getElementById('score1');
+            const s2Input = document.getElementById('score2');
+            const numInput = document.getElementById('matchNumber');
+            const dateInput = document.getElementById('matchDate');
+
+            const t1 = t1Input.value;
+            const t2 = t2Input.value;
+            const s1 = Number(s1Input.value);
+            const s2 = Number(s2Input.value);
+            const num = Number(numInput.value);
+            const date = dateInput.value;
+
+            [t1Input, t2Input, s1Input, s2Input, numInput, dateInput].forEach(clearError);
+
+            let valid = true;
+
+            if (!Validator.validate(t1, ['required'])) {
+                showError(t1Input, "اختر الفريق");
+                valid = false;
+            }
+
+            if (!Validator.validate(t2, ['required'])) {
+                showError(t2Input, "اختر الفريق");
+                valid = false;
+            }
+
+            if (t1 === t2) {
+                showError(t2Input, "لا يمكن اختيار نفس الفريق");
+                valid = false;
+            }
+
+            if (!Validator.validate(s1, ['required', 'integer', ['min', 0]])) {
+                showError(s1Input, "رقم صحيح ≥ 0");
+                valid = false;
+            }
+
+            if (!Validator.validate(s2, ['required', 'integer', ['min', 0]])) {
+                showError(s2Input, "رقم صحيح ≥ 0");
+                valid = false;
+            }
+
+            if (!Validator.validate(num, ['required', 'integer', ['min', 1]])) {
+                showError(numInput, "رقم المباراة غير صحيح");
+                valid = false;
+            }
+
+            if (!Validator.validate(date, ['required'])) {
+                showError(dateInput, "حدد التاريخ");
+                valid = false;
+            }
+
+            if (!valid) return;
+
+            data.matches.push({
+                id: Date.now(),
+                matchNumber: num,
+                t1,
+                t2,
+                s1,
+                s2,
+                date
+            });
+
+            recalculateTeams();
+            saveData();
+        }
+
+        function renderAll() {
+            const options = '<option value="">اختر الفريق</option>' + data.teams.map(t => `<option value="${t.name}">${t.name}</option>`).join('');
+            ['playerTeam', 'matchTeam1', 'matchTeam2'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) { const val = el.value; el.innerHTML = options; el.value = val; }
+            });
+
+            document.getElementById('teamsList').innerHTML = data.teams.map((t, i) => `<tr><td>${i + 1}</td><td>${t.name}</td><td>${t.played}</td><td>${t.won}</td><td>${t.points}</td><td><button class="btn btn-sm text-danger" onclick="deleteItem('teams', ${t.id})"><i class="fas fa-trash"></i></button></td></tr>`).join('');
+
+            document.getElementById('playersList').innerHTML = data.players.map(p => `<tr><td>${p.name} (#${p.number})</td><td>${p.team}</td><td><input type="number" class="form-control form-control-sm w-75 mx-auto" value="${p.goals}" onchange="updateStat(${p.id}, 'goals', this.value)"></td><td><input type="number" class="form-control form-control-sm w-75 mx-auto border-warning" value="${p.yellow || 0}" onchange="updateStat(${p.id}, 'yellow', this.value)"></td><td><input type="number" class="form-control form-control-sm w-75 mx-auto border-danger" value="${p.red || 0}" onchange="updateStat(${p.id}, 'red', this.value)"></td><td><button class="btn btn-sm text-danger" onclick="deleteItem('players', ${p.id})"><i class="fas fa-trash"></i></button></td></tr>`).join('');
+
+            const suspended = data.players.filter(p => (p.red > 0) || (p.yellow >= YELLOW_LIMIT));
+            document.getElementById('suspendedList').innerHTML = suspended.map(p => `<tr class="table-light"><td>${p.name}</td><td>${p.team}</td><td>${p.red > 0 ? '<span class="badge bg-danger">كرت أحمر</span>' : '<span class="badge bg-warning text-dark">تراكم إنذارات</span>'}</td><td class="text-danger fw-bold">موقوف</td></tr>`).join('') || '<tr><td colspan="4">لا يوجد موقوفين</td></tr>';
+
+            document.getElementById('matchesHistory').innerHTML = data.matches.map(m => `<tr><td>${m.matchNumber}</td><td>${m.t1}</td><td class="fw-bold">${m.s1} - ${m.s2}</td><td>${m.t2}</td><td>${m.date}</td><td class="no-print"><button class="btn btn-sm btn-outline-danger" onclick="deleteMatch(${m.id})"><i class="fas fa-trash"></i></button></td></tr>`).join('');
+
+            const sorted = [...data.teams].sort((a, b) => b.points - a.points || (b.gf - b.ga) - (a.gf - a.ga));
+            document.getElementById('standingsTable').innerHTML = sorted.map((t, i) => `<tr><td>${i + 1}</td><td class="fw-bold">${t.name}</td><td>${t.played}</td><td>${t.won}</td><td>${t.drawn}</td><td>${t.lost}</td><td>${t.gf - t.ga}</td><td class="text-primary fw-bold">${t.points}</td></tr>`).join('');
+
+            const scorers = [...data.players].filter(p => p.goals > 0).sort((a, b) => b.goals - a.goals);
+            document.getElementById('scorersList').innerHTML = scorers.map((p, i) => `<tr><td>${i + 1}</td><td>${p.name}</td><td>${p.team}</td><td class="fw-bold text-danger">${p.goals}</td></tr>`).join('');
+        }
+
+        function updateStat(id, key, val) {
+            const p = data.players.find(x => x.id === id);
+            if (p) { p[key] = parseInt(val) || 0; saveData(); }
+        }
+
+        function deleteItem(type, id) {
+            if (confirm('حذف؟')) { data[type] = data[type].filter(x => x.id !== id); saveData(); }
+        }
+
+        function deleteMatch(id) {
+            if (confirm('حذف المباراة؟')) { data.matches = data.matches.filter(m => m.id !== id); recalculateTeams(); saveData(); }
+        }
+
+        function recalculateTeams() {
+            data.teams.forEach(t => { t.played = t.won = t.drawn = t.lost = t.gf = t.ga = t.points = 0; });
+            data.matches.forEach(m => {
+                const team1 = data.teams.find(t => t.name === m.t1);
+                const team2 = data.teams.find(t => t.name === m.t2);
+                if (team1 && team2) {
+                    team1.played++; team2.played++;
+                    team1.gf += m.s1; team1.ga += m.s2;
+                    team2.gf += m.s2; team2.ga += m.s1;
+                    if (m.s1 > m.s2) { team1.won++; team1.points += 3; team2.lost++; }
+                    else if (m.s2 > m.s1) { team2.won++; team2.points += 3; team1.lost++; }
+                    else { team1.drawn++; team2.drawn++; team1.points++; team2.points++; }
+                }
+            });
+        }
+
+        function clearAllData() {
+            if (confirm('مسح الكل؟')) { data = { teams: [], players: [], matches: [] }; saveData(); }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const dt = document.getElementById('matchDate');
+            if (dt) dt.value = new Date().toISOString().split('T')[0];
+            renderAll();
+        });
+
+        function toggleButton(buttonId, isValid) {
+            document.getElementById(buttonId).disabled = !isValid;
+        }
+    </script>
+</body>
+
+</html>

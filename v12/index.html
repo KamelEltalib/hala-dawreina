@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>هلا دوريانا | النظام المتكامل لإدارة الدوريات</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-dark: #0f172a;
+            --primary-sidebar: #1e293b;
+            --accent-blue: #3b82f6;
+            --accent-hover: #2563eb;
+            --danger-soft: #ef4444;
+            --warning-soft: #f59e0b;
+            --success-emerald: #10b981;
+            --gray-bg: #f1f5f9;
+            --card-white: #ffffff;
+            --border-light: #e2e8f0;
+            --text-dark: #0f172a;
+            --text-muted: #475569;
+            --shadow-sm: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            --radius-card: 1.25rem;
+            --radius-element: 0.75rem;
+        }
+
+        body {
+            background: var(--gray-bg);
+            font-family: 'Cairo', sans-serif;
+            direction: rtl;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            height: 100vh;
+            background: linear-gradient(145deg, var(--primary-sidebar) 0%, #0f172a 100%);
+            color: #e2e8f0;
+            position: fixed;
+            right: 0;
+            top: 0;
+            width: 280px;
+            z-index: 1050;
+            transition: 0.3s;
+            box-shadow: 5px 0 25px rgba(0, 0, 0, 0.12);
+        }
+
+        .sidebar-header {
+            padding: 1.8rem 1.5rem;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.25);
+        }
+
+        .sidebar-header h3 {
+            font-weight: 800;
+            color: #fff;
+            margin: 0;
+        }
+
+        .nav-link {
+            color: #cbd5e1;
+            padding: 0.85rem 1.2rem;
+            margin: 6px 12px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            text-decoration: none;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        .main-content {
+            margin-right: 280px;
+            padding: 2rem;
+            transition: 0.3s;
+        }
+
+        /* Search & Filter Bar */
+        .search-box {
+            position: relative;
+        }
+
+        .search-box i {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        .search-box .form-control {
+            padding-right: 35px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+
+        .card-modern {
+            background: var(--card-white);
+            border-radius: var(--radius-card);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 2rem;
+            overflow: hidden;
+            border: none;
+        }
+
+        .card-header-modern {
+            padding: 1.2rem 1.5rem;
+            border-bottom: 2px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .card-header-modern span {
+            font-weight: 700;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pagination-container {
+            padding: 1.5rem;
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            background: #fff;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .page-btn {
+            border: 1px solid var(--border-light);
+            background: #fff;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .page-btn.active {
+            background: var(--accent-blue);
+            color: white;
+            border-color: var(--accent-blue);
+        }
+
+        .page-btn:hover:not(.active) {
+            background: #f8fafc;
+        }
+
+        /* Printing logic */
+        @media print {
+
+            .sidebar,
+            .no-print,
+            .pagination-container,
+            .search-box,
+            .btn,
+            .nav,
+            .sidebar-header {
+                display: none !important;
+            }
+
+            .main-content {
+                margin-right: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+            }
+
+            .card-modern {
+                box-shadow: none !important;
+                border: 1px solid #eee !important;
+                margin-bottom: 0 !important;
+            }
+
+            table {
+                width: 100% !important;
+                border-collapse: collapse !important;
+            }
+
+            th,
+            td {
+                border: 1px solid #ddd !important;
+                padding: 8px !important;
+            }
+
+            .section {
+                display: block !important;
+                opacity: 1 !important;
+            }
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 80px;
+            }
+
+            .sidebar span,
+            .sidebar-header h3 span {
+                display: none;
+            }
+
+            .main-content {
+                margin-right: 80px;
+            }
+
+            .nav-link {
+                justify-content: center;
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar no-print">
+        <div class="sidebar-header text-center">
+            <h3><i class="fas fa-trophy text-warning"></i> <span>هلا دوريانا</span></h3>
+        </div>
+        <nav class="nav flex-column mt-3">
+            <a class="nav-link active" onclick="showSection('teams', this)"><i class="fas fa-users"></i>
+                <span>الفرق</span></a>
+            <a class="nav-link" onclick="showSection('players', this)"><i class="fas fa-running"></i>
+                <span>اللاعبين</span></a>
+            <a class="nav-link" onclick="showSection('matches', this)"><i class="fas fa-calendar-alt"></i>
+                <span>المباريات</span></a>
+            <a class="nav-link" onclick="showSection('suspended', this)"><i class="fas fa-user-slash"></i>
+                <span>الموقوفين</span></a>
+            <a class="nav-link" onclick="showSection('reports', this)"><i class="fas fa-chart-line"></i>
+                <span>الترتيب</span></a>
+            <a class="nav-link" onclick="showSection('scorers', this)"><i class="fas fa-medal"></i>
+                <span>الهدافين</span></a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+
+        <section id="teams" class="section active">
+            <div class="card-modern no-print">
+                <div class="card-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-9"><input type="text" id="teamName" class="form-control"
+                                placeholder="أدخل اسم الفريق الجديد..."></div>
+                        <div class="col-md-3"><button class="btn btn-primary w-100 fw-bold" onclick="addTeam()">حفظ
+                                الفريق</button></div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-modern">
+                <div class="card-header-modern">
+                    <span><i class="fas fa-list text-primary"></i> الفرق المسجلة</span>
+                    <div class="search-box no-print">
+                        <i class="fas fa-search"></i>
+                        <input type="text" class="form-control" placeholder="بحث..."
+                            onkeyup="updateFilter('teams', this.value)">
+                    </div>
+                </div>
+                <div id="teams-container"></div>
+            </div>
+        </section>
+
+        <section id="players" class="section">
+            <div class="card-modern no-print">
+                <div class="card-body p-4">
+                    <div class="row g-2">
+                        <div class="col-md-4"><input type="text" id="playerName" class="form-control"
+                                placeholder="اسم اللاعب"></div>
+                        <div class="col-md-2"><input type="number" id="playerNum" class="form-control"
+                                placeholder="الرقم"></div>
+                        <div class="col-md-4"><select id="playerTeam" class="form-select"></select></div>
+                        <div class="col-md-2"><button class="btn btn-primary w-100 fw-bold"
+                                onclick="addPlayer()">إضافة</button></div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-modern">
+                <div class="card-header-modern">
+                    <span><i class="fas fa-users text-primary"></i> قائمة اللاعبين</span>
+                    <div class="search-box no-print">
+                        <i class="fas fa-search"></i>
+                        <input type="text" class="form-control" placeholder="بحث باسم اللاعب أو الفريق..."
+                            onkeyup="updateFilter('players', this.value)">
+                    </div>
+                </div>
+                <div id="players-container"></div>
+            </div>
+        </section>
+
+        <section id="matches" class="section">
+            <div class="card-modern no-print">
+                <div class="card-body p-4">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-2"><label class="small fw-bold">رقم المباراة</label><input type="number"
+                                id="matchNumber" class="form-control"></div>
+                        <div class="col-md-3"><label class="small fw-bold">الفريق 1</label><select id="matchTeam1"
+                                class="form-select"></select></div>
+                        <div class="col-md-1 text-center"><label class="small">له</label><input type="number"
+                                id="score1" class="form-control text-center" value="0"></div>
+                        <div class="col-md-1 text-center"><label class="small">عليه</label><input type="number"
+                                id="score2" class="form-control text-center" value="0"></div>
+                        <div class="col-md-3"><label class="small fw-bold">الفريق 2</label><select id="matchTeam2"
+                                class="form-select"></select></div>
+                        <div class="col-md-2"><label class="small fw-bold">التاريخ</label><input type="date"
+                                id="matchDate" class="form-control"></div>
+                        <div class="col-12"><button class="btn btn-dark w-100 mt-2 fw-bold" onclick="addMatch()">اعتماد
+                                النتيجة</button></div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-modern">
+                <div class="card-header-modern">
+                    <span><i class="fas fa-history text-primary"></i> سجل المباريات</span>
+                    <div class="d-flex gap-2 no-print align-items-center">
+                        <input type="date" class="form-control form-control-sm" onchange="updateDateFilter(this.value)">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" class="form-control" placeholder="بحث بالفريق..."
+                                onkeyup="updateFilter('matches', this.value)">
+                        </div>
+                        <button class="btn btn-danger btn-sm" onclick="window.print()"><i
+                                class="fas fa-print"></i></button>
+                    </div>
+                </div>
+                <div id="matches-container"></div>
+            </div>
+        </section>
+
+        <section id="suspended" class="section">
+            <div class="card-modern">
+                <div class="card-header-modern">
+                    <span><i class="fas fa-user-slash text-danger"></i> اللاعبين الموقوفين</span>
+                    <div class="d-flex gap-2 no-print">
+                        <div class="search-box"><i class="fas fa-search"></i><input type="text" class="form-control"
+                                onkeyup="updateFilter('suspended', this.value)"></div>
+                        <button class="btn btn-danger btn-sm" onclick="window.print()">طباعة</button>
+                    </div>
+                </div>
+                <div id="suspended-container"></div>
+            </div>
+        </section>
+
+        <section id="reports" class="section">
+            <div class="card-modern">
+                <div class="card-header-modern">
+                    <span><i class="fas fa-chart-line text-success"></i> جدول الترتيب العام</span>
+                    <button class="btn btn-danger btn-sm no-print" onclick="window.print()">طباعة PDF</button>
+                </div>
+                <div id="standings-container"></div>
+            </div>
+        </section>
+
+        <section id="scorers" class="section">
+            <div class="card-modern">
+                <div class="card-header-modern">
+                    <span><i class="fas fa-medal text-warning"></i> قائمة الهدافين</span>
+                    <div class="d-flex gap-2 no-print">
+                        <div class="search-box"><i class="fas fa-search"></i><input type="text" class="form-control"
+                                onkeyup="updateFilter('scorers', this.value)"></div>
+                        <button class="btn btn-danger btn-sm" onclick="window.print()">طباعة</button>
+                    </div>
+                </div>
+                <div id="scorers-container"></div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // بيانات النظام
+        let data = JSON.parse(localStorage.getItem('halaDoryana_vFinal')) || { teams: [], players: [], matches: [] };
+
+        // إعدادات الفلترة والترقيم
+        let filters = { teams: '', players: '', matches: '', matchesDate: '', suspended: '', scorers: '' };
+        let pages = { teams: 1, players: 1, matches: 1, suspended: 1, scorers: 1 };
+        const limit = 10;
+
+        function saveData() {
+            localStorage.setItem('halaDoryana_vFinal', JSON.stringify(data));
+            renderAll();
+        }
+
+        function showSection(id, btn) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            btn.classList.add('active');
+            renderAll();
+        }
+
+        // --- الإضافات ---
+        function addTeam() {
+            const name = document.getElementById('teamName').value.trim();
+            if (!name || data.teams.find(t => t.name === name)) return alert("اسم الفريق غير صالح أو موجود مسبقاً");
+            data.teams.push({ id: Date.now(), name, played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 });
+            document.getElementById('teamName').value = '';
+            saveData();
+        }
+
+        function addPlayer() {
+            const name = document.getElementById('playerName').value.trim();
+            const num = document.getElementById('playerNum').value;
+            const team = document.getElementById('playerTeam').value;
+            if (!name || !team) return alert("أكمل بيانات اللاعب");
+            data.players.push({ id: Date.now(), name, number: num, team, goals: 0, yellow: 0, red: 0 });
+            document.getElementById('playerName').value = '';
+            saveData();
+        }
+
+        function addMatch() {
+            const t1 = document.getElementById('matchTeam1').value;
+            const t2 = document.getElementById('matchTeam2').value;
+            const s1 = parseInt(document.getElementById('score1').value) || 0;
+            const s2 = parseInt(document.getElementById('score2').value) || 0;
+            const num = document.getElementById('matchNumber').value;
+            const date = document.getElementById('matchDate').value;
+
+            if (!t1 || !t2 || t1 === t2 || !date) return alert("تحقق من بيانات المباراة");
+
+            data.matches.push({ id: Date.now(), num, t1, t2, s1, s2, date });
+            recalculate();
+            saveData();
+        }
+
+        function recalculate() {
+            data.teams.forEach(t => { t.played = 0; t.won = 0; t.drawn = 0; t.lost = 0; t.gf = 0; t.ga = 0; t.points = 0; });
+            data.matches.forEach(m => {
+                const a = data.teams.find(t => t.name === m.t1);
+                const b = data.teams.find(t => t.name === m.t2);
+                if (a && b) {
+                    a.played++; b.played++; a.gf += m.s1; a.ga += m.s2; b.gf += m.s2; b.ga += m.s1;
+                    if (m.s1 > m.s2) { a.won++; a.points += 3; b.lost++; }
+                    else if (m.s2 > m.s1) { b.won++; b.points += 3; a.lost++; }
+                    else { a.drawn++; b.drawn++; a.points += 1; b.points += 1; }
+                }
+            });
+        }
+
+        // --- محرك البحث والترقيم ---
+        function updateFilter(key, val) {
+            filters[key] = val.toLowerCase();
+            pages[key] = 1;
+            renderAll();
+        }
+
+        function updateDateFilter(val) {
+            filters.matchesDate = val;
+            renderAll();
+        }
+
+        function createTable(containerId, headers, rows, type) {
+            let filtered = rows;
+            // تطبيق البحث النصي
+            if (filters[type]) {
+                filtered = rows.filter(r => r.searchKey.toLowerCase().includes(filters[type]));
+            }
+            // تطبيق فلتر التاريخ للمباريات
+            if (type === 'matches' && filters.matchesDate) {
+                filtered = filtered.filter(r => r.date === filters.matchesDate);
+            }
+
+            const isPrinting = window.matchMedia('print').matches;
+            const total = filtered.length;
+            const totalPages = Math.ceil(total / limit);
+            const start = (pages[type] - 1) * limit;
+            const displayData = isPrinting ? filtered : filtered.slice(start, start + limit);
+
+            let html = `<div class="table-responsive"><table class="table align-middle text-center mb-0">
+                    <thead class="table-light"><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>`;
+
+            displayData.forEach(d => {
+                html += `<tr>${d.cells.map(c => `<td>${c}</td>`).join('')}</tr>`;
+            });
+
+            if (total === 0) html += `<tr><td colspan="${headers.length}" class="p-4 text-muted">لا توجد بيانات متاحة</td></tr>`;
+            html += `</tbody></table></div>`;
+
+            // أزرار الترقيم
+            if (!isPrinting && totalPages > 1) {
+                html += `<div class="pagination-container">`;
+                for (let i = 1; i <= totalPages; i++) {
+                    html += `<button class="page-btn ${i === pages[type] ? 'active' : ''}" onclick="goToPage('${type}', ${i})">${i}</button>`;
+                }
+                html += `</div>`;
+            }
+
+            document.getElementById(containerId).innerHTML = html;
+        }
+
+        function goToPage(type, p) { pages[type] = p; renderAll(); }
+
+        function updateStat(id, key, val) {
+            const p = data.players.find(x => x.id === id);
+            if (p) { p[key] = parseInt(val) || 0; saveData(); }
+        }
+
+        function deleteItem(type, id) {
+            if (confirm('حذف هذا العنصر؟')) {
+                data[type] = data[type].filter(x => x.id !== id);
+                if (type === 'matches') recalculate();
+                saveData();
+            }
+        }
+
+        // --- العرض النهائي ---
+        function renderAll() {
+            // تحديث القوائم
+            const opts = '<option value="">اختر الفريق...</option>' + data.teams.map(t => `<option value="${t.name}">${t.name}</option>`).join('');
+            ['playerTeam', 'matchTeam1', 'matchTeam2'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) { const v = el.value; el.innerHTML = opts; el.value = v; }
+            });
+
+            // جداول البيانات
+            createTable('teams-container', ['#', 'الفريق', 'لعب', 'نقاط', 'إجراء'], data.teams.map((t, i) => ({
+                searchKey: t.name,
+                cells: [i + 1, `<strong>${t.name}</strong>`, t.played, `<span class="badge bg-primary">${t.points}</span>`, `<button class="btn btn-sm text-danger" onclick="deleteItem('teams', ${t.id})"><i class="fas fa-trash"></i></button>`]
+            })), 'teams');
+
+            createTable('players-container', ['اللاعب', 'الفريق', 'أهداف', 'صفراء', 'حمراء', 'حذف'], data.players.map(p => ({
+                searchKey: p.name + p.team,
+                cells: [p.name, p.team,
+                `<input type="number" value="${p.goals}" class="form-control form-control-sm mx-auto" style="width:50px" onchange="updateStat(${p.id}, 'goals', this.value)">`,
+                `<input type="number" value="${p.yellow}" class="form-control form-control-sm mx-auto" style="width:50px" onchange="updateStat(${p.id}, 'yellow', this.value)">`,
+                `<input type="number" value="${p.red}" class="form-control form-control-sm mx-auto" style="width:50px" onchange="updateStat(${p.id}, 'red', this.value)">`,
+                `<button class="btn btn-sm text-danger" onclick="deleteItem('players', ${p.id})"><i class="fas fa-trash"></i></button>`]
+            })), 'players');
+
+            createTable('matches-container', ['م', 'الفريق 1', 'النتيجة', 'الفريق 2', 'التاريخ', 'حذف'], data.matches.map(m => ({
+                searchKey: m.t1 + m.t2,
+                date: m.date,
+                cells: [m.num, m.t1, `<span class="fw-bold">${m.s1} - ${m.s2}</span>`, m.t2, m.date, `<button class="btn btn-sm text-danger" onclick="deleteItem('matches', ${m.id})"><i class="fas fa-trash"></i></button>`]
+            })), 'matches');
+
+            const suspended = data.players.filter(p => p.red > 0 || p.yellow >= 3);
+            createTable('suspended-container', ['اللاعب', 'الفريق', 'السبب'], suspended.map(p => ({
+                searchKey: p.name + p.team,
+                cells: [p.name, p.team, p.red > 0 ? '<span class="text-danger">كرت أحمر</span>' : '<span class="text-warning">3 كروت صفراء</span>']
+            })), 'suspended');
+
+            const ranked = [...data.teams].sort((a, b) => b.points - a.points || (b.gf - b.ga) - (a.gf - a.ga));
+            createTable('standings-container', ['ت', 'الفريق', 'لعب', 'ف', 'ت', 'خ', 'له', 'عليه', 'ن'], ranked.map((t, i) => ({
+                searchKey: t.name,
+                cells: [i + 1, t.name, t.played, t.won, t.drawn, t.lost, t.gf, t.ga, `<strong>${t.points}</strong>`]
+            })), 'reports');
+
+            const scorers = [...data.players].filter(p => p.goals > 0).sort((a, b) => b.goals - a.goals);
+            createTable('scorers-container', ['ت', 'اللاعب', 'الفريق', 'أهداف'], scorers.map((p, i) => ({
+                searchKey: p.name + p.team,
+                cells: [i + 1, p.name, p.team, `<strong>${p.goals}</strong> ⚽`]
+            })), 'scorers');
+        }
+
+        window.onbeforeprint = renderAll;
+        window.onafterprint = renderAll;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const d = document.getElementById('matchDate');
+            if (d) d.value = new Date().toISOString().split('T')[0];
+            renderAll();
+        });
+    </script>
+
+</body>
+
+</html>
